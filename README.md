@@ -1,8 +1,3 @@
-# Side-project starter kit 
+# Sourdough
 
-Three ingredients
-- Vercel for UI
-- Fly.io for backend
-- Supabase for (vector) database
-mixed just right to get a crispy side project with a great crumb.
-
+Side-project starter kit with three ingredients: Vercel (UI), Fly.io (backend), Supabase (vector DB).
