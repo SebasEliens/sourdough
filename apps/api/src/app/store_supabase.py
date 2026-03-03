@@ -51,3 +51,8 @@ class SupabaseStore:
             if hasattr(row["created_at"], "isoformat")
             else str(row["created_at"]),
         }
+
+    def clear_messages(self) -> None:
+        self._client.table("messages").delete().gte(
+            "created_at", "1970-01-01T00:00:00Z"
+        ).execute()

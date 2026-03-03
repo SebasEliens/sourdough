@@ -73,3 +73,37 @@ async def test_post_messages_rejects_empty_text(client: AsyncClient):
     assert r1.status_code == 422
     r2 = await client.post("/messages", json={"text": "   "})
     assert r2.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_delete_messages_returns_401_without_admin_secret(client: AsyncClient):
+    """DELETE /messages without X-Admin-Secret returns 401."""
+    response = await client.delete("/messages")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_messages_returns_401_with_wrong_admin_secret(client: AsyncClient):
+    """DELETE /messages with wrong X-Admin-Secret returns 401."""
+    response = await client.delete(
+        "/messages",
+        headers={"X-Admin-Secret": "wrong"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_messages_clears_all_messages_with_valid_secret(
+    client: AsyncClient, monkeypatch
+):
+    """DELETE /messages with valid X-Admin-Secret returns 200 and clears messages."""
+    monkeypatch.setenv("ADMIN_SECRET", "secret123")
+    await client.post("/messages", json={"text": "one"})
+    await client.post("/messages", json={"text": "two"})
+    response = await client.delete(
+        "/messages",
+        headers={"X-Admin-Secret": "secret123"},
+    )
+    assert response.status_code == 200
+    get_resp = await client.get("/messages")
+    assert get_resp.json() == []

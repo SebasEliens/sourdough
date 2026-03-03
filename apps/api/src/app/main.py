@@ -1,9 +1,17 @@
-from fastapi import Depends, FastAPI
+import os
+
+from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, field_validator
 
 from app.store import MessageStore, get_store
 
 app = FastAPI(title="Sourdough API", version="0.1.0")
+
+
+def require_admin(x_admin_secret: str | None = Header(None, alias="X-Admin-Secret")) -> None:
+    secret = os.getenv("ADMIN_SECRET")
+    if not secret or x_admin_secret != secret:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 class CreateMessageBody(BaseModel):
@@ -37,3 +45,13 @@ def create_message(
 ) -> dict:
     """Create a message and return it."""
     return store.create_message(body.text)
+
+
+@app.delete("/messages")
+def delete_messages(
+    _: None = Depends(require_admin),
+    store: MessageStore = Depends(get_store),
+) -> dict:
+    """Clear all messages. Requires X-Admin-Secret header."""
+    store.clear_messages()
+    return {"ok": True}

@@ -15,6 +15,7 @@ def _make_entry(id_: str, text: str, timestamp: str) -> dict:
 class MessageStore(Protocol):
     def list_messages(self) -> list[dict]: ...
     def create_message(self, text: str) -> dict: ...
+    def clear_messages(self) -> None: ...
 
 
 class InMemoryStore:
@@ -32,6 +33,9 @@ class InMemoryStore:
         )
         self._messages.insert(0, entry)
         return entry
+
+    def clear_messages(self) -> None:
+        self._messages.clear()
 
 
 _store: MessageStore | None = None
