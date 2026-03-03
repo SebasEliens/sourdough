@@ -18,3 +18,11 @@ async def test_root_returns_ok(client: AsyncClient):
     response = await client.get("/")
     assert response.status_code == 200
     assert response.json() == {"ok": True}
+
+
+@pytest.mark.asyncio
+async def test_get_messages_returns_empty_list_when_no_messages(client: AsyncClient):
+    """GET /messages returns 200 and empty list when no messages exist."""
+    response = await client.get("/messages")
+    assert response.status_code == 200
+    assert response.json() == []

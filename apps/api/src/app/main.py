@@ -7,3 +7,9 @@ app = FastAPI(title="Sourdough API", version="0.1.0")
 def root() -> dict:
     """Health/readiness check."""
     return {"ok": True}
+
+
+@app.get("/messages")
+def list_messages() -> list:
+    """Return all messages (newest first)."""
+    return []
