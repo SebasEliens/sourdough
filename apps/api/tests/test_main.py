@@ -26,3 +26,19 @@ async def test_get_messages_returns_empty_list_when_no_messages(client: AsyncCli
     response = await client.get("/messages")
     assert response.status_code == 200
     assert response.json() == []
+
+
+@pytest.mark.asyncio
+async def test_post_messages_creates_and_returns_message(client: AsyncClient):
+    """POST /messages with valid text returns 201 and created message with id, text, timestamp."""
+    response = await client.post("/messages", json={"text": "hello"})
+    assert response.status_code == 201
+    body = response.json()
+    assert "id" in body
+    assert isinstance(body["id"], str)
+    assert body["text"] == "hello"
+    assert "timestamp" in body
+    assert isinstance(body["timestamp"], str)
+    # Timestamp should be ISO format
+    from datetime import datetime
+    datetime.fromisoformat(body["timestamp"].replace("Z", "+00:00"))
