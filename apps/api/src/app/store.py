@@ -1,4 +1,4 @@
-"""Message store abstraction: in-memory (tests/default) or Supabase (when env set)."""
+"""Message store abstraction: in-memory (tests/default), Postgres (DATABASE_URL), or Supabase (env set)."""
 
 from __future__ import annotations
 
@@ -44,7 +44,10 @@ _store: MessageStore | None = None
 def get_store() -> MessageStore:
     global _store
     if _store is None:
-        if os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
+        if os.getenv("DATABASE_URL"):
+            from app.store_postgres import PostgresStore
+            _store = PostgresStore()
+        elif os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
             from app.store_supabase import SupabaseStore
             _store = SupabaseStore()
         else:
