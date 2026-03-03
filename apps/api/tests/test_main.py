@@ -57,3 +57,19 @@ async def test_get_messages_returns_all_entries_newest_first(client: AsyncClient
     assert len(messages) == 2
     assert messages[0]["text"] == "second"
     assert messages[1]["text"] == "first"
+
+
+@pytest.mark.asyncio
+async def test_post_messages_rejects_missing_text(client: AsyncClient):
+    """POST /messages without text returns 422."""
+    response = await client.post("/messages", json={})
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_post_messages_rejects_empty_text(client: AsyncClient):
+    """POST /messages with empty or whitespace-only text returns 422."""
+    r1 = await client.post("/messages", json={"text": ""})
+    assert r1.status_code == 422
+    r2 = await client.post("/messages", json={"text": "   "})
+    assert r2.status_code == 422
