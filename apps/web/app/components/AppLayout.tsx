@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 import styles from './AppLayout.module.css'
 
 interface AppLayoutProps {

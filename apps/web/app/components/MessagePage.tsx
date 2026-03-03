@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { AppLayout } from './AppLayout'
 import { MessageLog } from './MessageLog'
 import { MessageInput } from './MessageInput'

@@ -1,6 +1,4 @@
+dist
 node_modules
-.next
 coverage
 *.min.js
-apps/api
-packages/db
