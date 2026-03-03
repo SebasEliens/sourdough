@@ -10,7 +10,9 @@ export function MessageLog({ entries }: MessageLogProps) {
     return (
       <div className={styles.empty} aria-live="polite">
         <span className={styles.emptyLabel}>{'// no messages yet'}</span>
-        <span className={styles.emptyHint}>Send a message to see it logged (mocked)</span>
+        <span className={styles.emptyHint}>
+          Send a message to see it logged
+        </span>
       </div>
     )
   }

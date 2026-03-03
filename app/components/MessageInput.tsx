@@ -21,7 +21,7 @@ export function MessageInput({ onSend }: MessageInputProps) {
         inputRef.current?.focus()
       }
     },
-    [value, onSend],
+    [value, onSend]
   )
 
   const handleKeyDown = useCallback(
@@ -31,7 +31,7 @@ export function MessageInput({ onSend }: MessageInputProps) {
         handleSubmit(e as unknown as React.FormEvent)
       }
     },
-    [handleSubmit],
+    [handleSubmit]
   )
 
   return (
