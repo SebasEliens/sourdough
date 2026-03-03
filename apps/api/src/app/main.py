@@ -1,13 +1,9 @@
-import uuid
-from datetime import datetime, timezone
-
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel, field_validator
 
-app = FastAPI(title="Sourdough API", version="0.1.0")
+from app.store import MessageStore, get_store
 
-# In-memory store (newest first)
-_messages: list[dict] = []
+app = FastAPI(title="Sourdough API", version="0.1.0")
 
 
 class CreateMessageBody(BaseModel):
@@ -29,18 +25,15 @@ def root() -> dict:
 
 
 @app.get("/messages")
-def list_messages() -> list:
+def list_messages(store: MessageStore = Depends(get_store)) -> list:
     """Return all messages (newest first)."""
-    return _messages.copy()
+    return store.list_messages()
 
 
 @app.post("/messages", status_code=201)
-def create_message(body: CreateMessageBody) -> dict:
+def create_message(
+    body: CreateMessageBody,
+    store: MessageStore = Depends(get_store),
+) -> dict:
     """Create a message and return it."""
-    entry = {
-        "id": str(uuid.uuid4()),
-        "text": body.text,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    }
-    _messages.insert(0, entry)
-    return entry
+    return store.create_message(body.text)
