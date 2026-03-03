@@ -5,9 +5,10 @@ import styles from './MessageInput.module.css'
 
 interface MessageInputProps {
   onSend: (text: string) => void
+  disabled?: boolean
 }
 
-export function MessageInput({ onSend }: MessageInputProps) {
+export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
   const [value, setValue] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -47,9 +48,14 @@ export function MessageInput({ onSend }: MessageInputProps) {
           placeholder="Type a message..."
           rows={1}
           aria-label="Message"
+          disabled={disabled}
         />
       </div>
-      <button type="submit" className={styles.send} disabled={!value.trim()}>
+      <button
+        type="submit"
+        className={styles.send}
+        disabled={disabled || !value.trim()}
+      >
         SEND
       </button>
     </form>
