@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sourdough
+      POSTGRES_PASSWORD: sourdough
+      POSTGRES_DB: sourdough
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/db/migrations/20250303000000_create_messages_table.sql:/docker-entrypoint-initdb.d/01-messages.sql
+
+volumes:
+  postgres_data:
