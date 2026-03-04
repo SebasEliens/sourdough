@@ -2,20 +2,12 @@
 
 from __future__ import annotations
 
-import os
-
-from supabase import create_client, Client
-
-
-def _supabase_client() -> Client:
-    url = os.environ["SUPABASE_URL"]
-    key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
-    return create_client(url, key)
+from supabase import Client, create_client
 
 
 class SupabaseStore:
-    def __init__(self) -> None:
-        self._client = _supabase_client()
+    def __init__(self, *, supabase_url: str, supabase_service_role_key: str) -> None:
+        self._client: Client = create_client(supabase_url, supabase_service_role_key)
 
     def list_messages(self) -> list[dict]:
         resp = (

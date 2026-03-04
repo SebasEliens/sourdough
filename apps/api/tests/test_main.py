@@ -97,7 +97,12 @@ async def test_delete_messages_clears_all_messages_with_valid_secret(
     client: AsyncClient, monkeypatch
 ):
     """DELETE /messages with valid X-Admin-Secret returns 200 and clears messages."""
+    import app.config as config
+    from app.config import Settings
+
     monkeypatch.setenv("ADMIN_SECRET", "secret123")
+    monkeypatch.setenv("CORS_ORIGINS", "*")
+    config.settings = Settings()  # reload from env
     await client.post("/messages", json={"text": "one"})
     await client.post("/messages", json={"text": "two"})
     response = await client.delete(

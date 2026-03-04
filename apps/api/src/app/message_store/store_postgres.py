@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from contextlib import contextmanager
 
 import psycopg
@@ -19,18 +18,17 @@ def _row_to_entry(row: dict) -> dict:
 
 
 @contextmanager
-def _connection():
-    url = os.environ["DATABASE_URL"]
-    with psycopg.connect(url, row_factory=dict_row) as conn:
+def _connection(database_url: str):
+    with psycopg.connect(database_url, row_factory=dict_row) as conn:
         yield conn
 
 
 class PostgresStore:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, *, database_url: str) -> None:
+        self._database_url = database_url
 
     def list_messages(self) -> list[dict]:
-        with _connection() as conn:
+        with _connection(self._database_url) as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     "SELECT id, text, created_at FROM public.messages ORDER BY created_at DESC"
@@ -38,7 +36,7 @@ class PostgresStore:
                 return [_row_to_entry(row) for row in cur.fetchall()]
 
     def create_message(self, text: str) -> dict:
-        with _connection() as conn:
+        with _connection(self._database_url) as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     "INSERT INTO public.messages (text) VALUES (%s) RETURNING id, text, created_at",
@@ -51,7 +49,7 @@ class PostgresStore:
                 return _row_to_entry(row)
 
     def clear_messages(self) -> None:
-        with _connection() as conn:
+        with _connection(self._database_url) as conn:
             with conn.cursor() as cur:
                 cur.execute("DELETE FROM public.messages")
                 conn.commit()

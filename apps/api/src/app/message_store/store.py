@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import os
 import uuid
 from datetime import datetime, timezone
 from typing import Protocol
 
+from app.config import settings
 
 def _make_entry(id_: str, text: str, timestamp: str) -> dict:
     return {"id": id_, "text": text, "timestamp": timestamp}
@@ -44,12 +44,15 @@ _store: MessageStore | None = None
 def get_store() -> MessageStore:
     global _store
     if _store is None:
-        if os.getenv("DATABASE_URL"):
-            from app.store_postgres import PostgresStore
-            _store = PostgresStore()
-        elif os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
-            from app.store_supabase import SupabaseStore
-            _store = SupabaseStore()
+        if settings.database_url:
+            from app.message_store.store_postgres import PostgresStore
+            _store = PostgresStore(database_url=settings.database_url)
+        elif settings.supabase_url and settings.supabase_service_role_key:
+            from app.message_store.store_supabase import SupabaseStore
+            _store = SupabaseStore(
+                supabase_url=settings.supabase_url,
+                supabase_service_role_key=settings.supabase_service_role_key,
+            )
         else:
             _store = InMemoryStore()
     return _store

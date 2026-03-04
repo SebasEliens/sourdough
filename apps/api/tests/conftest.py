@@ -2,8 +2,8 @@
 
 import pytest
 
-import app.store as store_module
-from app.store import InMemoryStore, get_store
+from app.message_store import store as store_module
+from app.message_store.store import InMemoryStore, get_store
 
 
 @pytest.fixture(autouse=True)

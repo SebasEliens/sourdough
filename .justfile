@@ -15,3 +15,13 @@ docker-up:
 
 docker-down:
     docker compose down
+
+[working-directory: "apps/api"]
+test-api:
+    uv run pytest
+
+[working-directory: "apps/web"]
+test-web:
+    npm run test
+
+test: test-api test-web
