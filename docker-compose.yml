@@ -18,6 +18,7 @@ services:
     environment:
       DATABASE_URL: postgresql://sourdough:sourdough@postgres:5432/sourdough
       ADMIN_SECRET: ${ADMIN_SECRET:-sourdough-admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     ports:
       - "8000:8000"
     depends_on:

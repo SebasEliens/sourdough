@@ -1,11 +1,21 @@
 import os
 
 from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
 from app.store import MessageStore, get_store
 
 app = FastAPI(title="Sourdough API", version="0.1.0")
+
+_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Admin-Secret"],
+)
 
 
 def require_admin(x_admin_secret: str | None = Header(None, alias="X-Admin-Secret")) -> None:
