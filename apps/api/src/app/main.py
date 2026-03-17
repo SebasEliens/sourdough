@@ -1,7 +1,8 @@
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
-
+from starlette.responses import Response
+from typing import Annotated
 from app.config import get_settings
 from app.message_store.store import MessageStore, get_store
 
@@ -9,14 +10,17 @@ app = FastAPI(title="Sourdough API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_settings().cors_origins_list(),
+    allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "X-Admin-Secret"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS", "HEAD"],
+    allow_headers=["Content-Type", "Accept", "Authorization", "X-Admin-Secret"],
+    expose_headers=["*"],
+    max_age=600,
 )
 
-
-def require_admin(x_admin_secret: str | None = Header(None, alias="X-Admin-Secret")) -> None:
+def require_admin(
+    x_admin_secret: Annotated[str | None, Header(alias="X-Admin-Secret")] = None,
+) -> None:
     secret = get_settings().admin_secret
     if not secret or x_admin_secret != secret:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -41,7 +45,7 @@ def root() -> dict:
 
 
 @app.get("/messages")
-def list_messages(store: MessageStore = Depends(get_store)) -> list:
+def list_messages(store: Annotated[MessageStore, Depends(get_store)]) -> list:
     """Return all messages (newest first)."""
     return store.list_messages()
 
@@ -49,7 +53,7 @@ def list_messages(store: MessageStore = Depends(get_store)) -> list:
 @app.post("/messages", status_code=201)
 def create_message(
     body: CreateMessageBody,
-    store: MessageStore = Depends(get_store),
+    store: Annotated[MessageStore, Depends(get_store)],
 ) -> dict:
     """Create a message and return it."""
     return store.create_message(body.text)
@@ -57,8 +61,8 @@ def create_message(
 
 @app.delete("/messages")
 def delete_messages(
-    _: None = Depends(require_admin),
-    store: MessageStore = Depends(get_store),
+    _: Annotated[None, Depends(require_admin)],
+    store: Annotated[MessageStore, Depends(get_store)],
 ) -> dict:
     """Clear all messages. Requires X-Admin-Secret header."""
     store.clear_messages()

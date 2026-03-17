@@ -2,8 +2,20 @@ check:
     npm run format
     sh .husky/pre-commit
 
-run:
+
+[working-directory: "apps/web"]
+run-web:
     npm run dev
+[working-directory: "apps/api"]
+run-api:
+    uv run uvicorn app.main:app --reload --port 8000
+
+run-db:
+    docker compose up -d postgres
+
+run: run-web run-api run-db
+
+
 
 # Start Postgres only (API/web on host with DATABASE_URL)
 docker-postgres:
@@ -23,5 +35,7 @@ test-api:
 [working-directory: "apps/web"]
 test-web:
     npm run test
+
+
 
 test: test-api test-web

@@ -21,6 +21,19 @@ async def test_root_returns_ok(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_options_messages_returns_200_for_cors_preflight(client: AsyncClient):
+    """OPTIONS /messages returns 200 for CORS preflight (e.g. from browser in Docker)."""
+    response = await client.options(
+        "/messages",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_get_messages_returns_empty_list_when_no_messages(client: AsyncClient):
     """GET /messages returns 200 and empty list when no messages exist."""
     response = await client.get("/messages")
