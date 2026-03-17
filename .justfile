@@ -6,14 +6,15 @@ check:
 [working-directory: "apps/web"]
 run-web:
     npm run dev
+    
 [working-directory: "apps/api"]
 run-api:
-    uv run uvicorn app.main:app --reload --port 8000
+    uv run uvicorn app.main:app --reload --port 8000 &
 
 run-db:
     docker compose up -d postgres
 
-run: run-web run-api run-db
+run: run-db run-api run-web
 
 
 
