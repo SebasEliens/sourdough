@@ -1,12 +1,9 @@
-check:
-    npm run format
-    sh .husky/pre-commit
 
 
 [working-directory: "apps/web"]
 run-web:
     npm run dev
-    
+
 [working-directory: "apps/api"]
 run-api:
     uv run uvicorn app.main:app --reload --port 8000 &
@@ -18,16 +15,17 @@ run: run-db run-api run-web
 
 
 
-# Start Postgres only (API/web on host with DATABASE_URL)
-docker-postgres:
-    docker compose up -d postgres
-
-# Start full stack (Postgres + API + Web)
-docker-up:
+up:
     docker compose up -d
 
-docker-down:
+down:
     docker compose down
+
+check:
+    npm run format
+    sh .husky/pre-commit
+    uv run ruff check .
+    uv run pre-commit
 
 [working-directory: "apps/api"]
 test-api:

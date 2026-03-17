@@ -1,7 +1,6 @@
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
-from starlette.responses import Response
 from typing import Annotated
 from app.config import get_settings
 from app.message_store.store import MessageStore, get_store
